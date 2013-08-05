@@ -43,8 +43,13 @@ except:
 
 import re
 import urllib2
+import pytaf
 
 TAF_URL="http://weather.noaa.gov/cgi-bin/mgettaf.pl?cccc=%s"
+
+class TAFException(Exception):
+    def __init__(self, msg):
+        self.strerror = msg
 
 class TAF(callbacks.Plugin):
     """Displays TAF information for specified ICAO airport code."""
@@ -54,16 +59,10 @@ class TAF(callbacks.Plugin):
         self.__parent = super(TAF, self)
         self.__parent.__init__(irc)
 
-    def taf(self, irc, msg, args, station):
-        """<ICAO airport code>
-
-           Display raw TAF information for <ICAO airport code>
-        """
-
+    def _fetch_taf(self, station):
         regex = re.compile("^[a-zA-Z]{4}$")
         if not regex.match(station):
-            irc.reply(station + " can't be a valid ICAO code")
-            return 1
+            raise TAFException(station + " can't be a valid ICAO code")
 
         try:
             station = station.upper()
@@ -73,28 +72,69 @@ class TAF(callbacks.Plugin):
             request = urllib2.urlopen(url)
             report = request.read()
         except Exception, e:
-            irc.reply("Could not fetch report for " + station + ". Make sure your code is correct and try again later.")
+            raise TAFException("Could not fetch report for " + station + ". Make sure your code is correct and try again later.")
             return 1
 
         re_nf = re.compile("No TAF from")
         nf = re_nf.search(report)
         if nf:
-            irc.reply("No TAF data from " + station.upper())
-            return 1
+            raise TAFException("No TAF data from " + station.upper())
 
         regex = re.compile("<pre>([^<]*)</pre>")
         match = regex.search(report)
         if match:
             report = match.group(1)
         else:
-            irc.reply("Parse error")
-            return 1
+            raise TAFException("Parse error")
+
+        return(report)
+
+
+    def taf(self, irc, msg, args, station):
+        """<ICAO airport code>
+
+           Display raw TAF information for <ICAO airport code>
+        """
+
+        try:
+            report = self._fetch_taf(station)
+        except TAFException as e:
+            irc.reply(e.strerror)
+            return(1)
 
         report = re.sub(r'TAF\s+', 'TAF ', report)
         report = re.sub(r'\n', ' ', report)
         report = re.sub(r'\s{2,}', '; ', report)
         irc.reply(report)
 
+    def itaf(self, irc, msg, args, station):
+       """<ICAO airport code>
+
+          Display decoded TAF information for <ICAO airport code>
+       """
+
+       try:
+            report = self._fetch_taf(station)
+       except TAFException as e:
+            irc.reply(e.strerror)
+            return(1)
+
+       try:       
+           parser = pytaf.TAF(report)
+           decoder = pytaf.Decoder(parser)
+       except pytaf.MalformedTAF as e:
+           irc.reply("An error had occured, parser says: " + e.strerror)
+           return(1)
+     
+       parsed_report = decoder.decode_taf()
+       parsed_report = parsed_report.split('\n')
+
+       for line in parsed_report:
+            if line:
+                irc.reply(line, to=msg.nick, prefixNick=False,
+                          private=True)
+
+    itaf = wrap(itaf, ["something"])
     taf = wrap(taf, ["something"])
 
 
