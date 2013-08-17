@@ -44,6 +44,7 @@ except:
 import re
 import urllib2
 import pytaf
+from tafdecoder_compact import DecoderCompact
 
 TAF_URL="http://weather.noaa.gov/cgi-bin/mgettaf.pl?cccc=%s"
 
@@ -121,8 +122,8 @@ class TAF(callbacks.Plugin):
 
        try:       
            parser = pytaf.TAF(report)
-           decoder = pytaf.Decoder(parser)
-       except pytaf.MalformedTAF as e:
+           decoder = DecoderCompact(parser)
+       except (pytaf.MalformedTAF, pytaf.DecodeError) as e:
            irc.reply("An error had occured, parser says: " + e.strerror)
            return(1)
      
