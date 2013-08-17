@@ -37,7 +37,7 @@ import supybot
 import supybot.world as world
 
 # Plugin information stuff
-__version__ = "0.1"
+__version__ = "0.1.2"
 __author__ = supybot.Author('Daniil Baturin', 'dmbaturin',
                             'daniil at baturin dot org')
 __contributors__ = {}
