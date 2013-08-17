@@ -133,6 +133,7 @@ class TAF(callbacks.Plugin):
             if line:
                 irc.reply(line, to=msg.nick, prefixNick=False,
                           private=True)
+       irc.reply("End of message", to=msg.nick, prefixNick=False, private=True)
 
     itaf = wrap(itaf, ["something"])
     taf = wrap(taf, ["something"])
