@@ -13,19 +13,19 @@ class DecoderCompact(Decoder):
                 result += self._decode_group_header(group["header"])
 
             if group["wind"]:
-                group_result.append( "Wind: %s" % self._decode_wind(group["wind"]) )
+                group_result.append( "Wind %s" % self._decode_wind(group["wind"]) )
 
             if group["visibility"]:
-                group_result.append( "Visibility: %s" % self._decode_visibility(group["visibility"]) )
+                group_result.append( "Visibility %s" % self._decode_visibility(group["visibility"]) )
 
             if group["clouds"]:
-                group_result.append( "Clouds: %s" % self._decode_clouds(group["clouds"]) )
+                group_result.append( "Clouds %s" % self._decode_clouds(group["clouds"]) )
 
             if group["weather"]:
-                group_result.append( "Weather: %s" % self._decode_weather(group["weather"]) )
+                group_result.append( "%s" % self._decode_weather(group["weather"]) )
 
             if group["windshear"]:
-                group_result.append( "Windshear: %s" % self._decode_windshear(group["windshear"]) )
+                group_result.append( "Windshear %s" % self._decode_windshear(group["windshear"]) )
 
             result += "; ".join(group_result) + "\n"
 
