@@ -19,7 +19,7 @@ class DecoderCompact(Decoder):
                 group_result.append( "Visibility %s" % self._decode_visibility(group["visibility"]) )
 
             if group["clouds"]:
-                group_result.append( "Clouds %s" % self._decode_clouds(group["clouds"]) )
+                group_result.append( "%s" % self._decode_clouds(group["clouds"]) )
 
             if group["weather"]:
                 group_result.append( "%s" % self._decode_weather(group["weather"]) )
