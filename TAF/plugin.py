@@ -72,7 +72,7 @@ class TAF(callbacks.Plugin):
                     urllib2.build_opener(urllib2.ProxyHandler, urllib2.HTTPHandler))
             request = urllib2.urlopen(url)
             report = request.read()
-        except Exception, e:
+        except Exception as e:
             raise TAFException("Could not fetch report for " + station + ". Make sure your code is correct and try again later.")
             return 1
 
