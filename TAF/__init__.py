@@ -47,12 +47,12 @@ from . import config
 from . import plugin
 from imp import reload
 import re
-import urllib2
+import urllib3
 # In case we're being reloaded.
 reload(config)
 reload(plugin)
 reload(re)
-reload(urllib2)
+reload(urllib3)
 # Add more reloads here if you add third-party modules and want them to be
 # reloaded when this plugin is reloaded.  Don't forget to import them as well!
 

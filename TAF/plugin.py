@@ -42,7 +42,7 @@ except:
     _ = lambda x:x
 
 import re
-import urllib2
+import urllib3
 import pytaf
 from tafdecoder_compact import DecoderCompact
 
@@ -59,6 +59,7 @@ class TAF(callbacks.Plugin):
     def __init__(self, irc):
         self.__parent = super(TAF, self)
         self.__parent.__init__(irc)
+        self._http = urllib3.PoolManager()
 
     def _fetch_taf(self, station):
         regex = re.compile("^[a-zA-Z]{4}$")
@@ -68,10 +69,8 @@ class TAF(callbacks.Plugin):
         try:
             station = station.upper()
             url = TAF_URL % station
-            urllib2.install_opener(
-                    urllib2.build_opener(urllib2.ProxyHandler, urllib2.HTTPHandler))
-            request = urllib2.urlopen(url)
-            report = request.read()
+            reply = self._http.request('GET', url)
+            report = reply.data
         except Exception as e:
             raise TAFException("Could not fetch report for " + station + ". Make sure your code is correct and try again later.")
             return 1
