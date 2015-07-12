@@ -101,7 +101,7 @@ class TAF(callbacks.Plugin):
             station = station.upper()
             url = TAF_URL % station
             reply = self._http.request('GET', url)
-            report = reply.data
+            report = reply.data.decode()
         except Exception as e:
             raise TAFException("Could not fetch report for " + station + ". Make sure your code is correct and try again later.")
             return 1
