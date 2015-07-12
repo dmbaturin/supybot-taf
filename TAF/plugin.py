@@ -44,13 +44,44 @@ except:
 import re
 import urllib3
 import pytaf
-from tafdecoder_compact import DecoderCompact
 
 TAF_URL="http://weather.noaa.gov/cgi-bin/mgettaf.pl?cccc=%s"
+
+class DecoderCompact(pytaf.Decoder):
+    def decode_taf(self):
+        result = ""
+
+        result += self._decode_header(self._taf.get_header()) + "\n"
+
+        for group in self._taf.get_groups():
+            group_result = []
+
+            if group["header"]:
+                result += self._decode_group_header(group["header"])
+            if group["wind"]:
+                group_result.append( "wind %s" % self._decode_wind(group["wind"]) )
+            if group["visibility"]:
+                group_result.append( "visibility %s" % self._decode_visibility(group["visibility"]) )
+            if group["clouds"]:
+                group_result.append( "%s" % self._decode_clouds(group["clouds"]) )
+            if group["weather"]:
+                group_result.append( "%s" % self._decode_weather(group["weather"]) )
+            if group["windshear"]:
+                group_result.append( "windshear %s" % self._decode_windshear(group["windshear"]) )
+            result += "; ".join(group_result) + "\n"
+
+        if self._taf.get_maintenance():
+            result += self._decode_maintenance(self._taf.get_maintenance())
+
+        result += "\n"
+
+        return(result)
+
 
 class TAFException(Exception):
     def __init__(self, msg):
         self.strerror = msg
+
 
 class TAF(callbacks.Plugin):
     """Displays TAF information for specified ICAO airport code."""
